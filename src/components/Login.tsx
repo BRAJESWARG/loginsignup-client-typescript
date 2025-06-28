@@ -21,7 +21,7 @@ const Login: React.FC = () => {
         setMessage(data.message);
 
         if (response.ok) {
-            dispatch(login());
+            dispatch(login(data.token));
         }
     };
 
