@@ -1,0 +1,39 @@
+.about-wrapper {
+    position: relative;
+    padding: 20px;
+    max-width: 700px;
+    margin: 50px auto;
+    background: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 10%;
+    padding: 8px 14px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.logout-button:hover {
+    background-color: #cc0000;
+}
+
+.about-section h2 {
+    margin-bottom: 10px;
+    font-size: 26px;
+    color: #222;
+}
+
+.about-section p {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.5;
+}

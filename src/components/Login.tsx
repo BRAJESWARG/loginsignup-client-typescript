@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../store/authSlice';
+import './Login.css';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const dispatch = useDispatch();
+
+    // useEffect(() =>{
+    //     console.log(message);
+    // })
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,16 +24,20 @@ const Login: React.FC = () => {
 
         const data = await response.json();
         setMessage(data.message);
+        // console.log(data.message);
+        // console.log(message);
+        
+        
 
-        if (response.ok) {
-            dispatch(login(data.token));
+        if (response.ok && data.token) {
+            dispatch(login(data.token));            
         }
     };
 
     return (
         <div className="login-container">
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
+            <h2 className="login-title">Login</h2>
+            <form onSubmit={(e)=>handleLogin(e)} className="login-form">
                 <input
                     type="text"
                     placeholder="Username"
@@ -45,7 +54,7 @@ const Login: React.FC = () => {
                 />
                 <button type="submit">Login</button>
             </form>
-            {message && <p>{message}</p>}
+            {message && <p className="message-text">{message}</p>}
         </div>
     );
 };
