@@ -7,37 +7,39 @@ const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [showModal, setShowModal] = useState(false);
     const dispatch = useDispatch();
-
-    // useEffect(() =>{
-    //     console.log(message);
-    // })
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:3001/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
+        try {
+            const response = await fetch('http://localhost:3001/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
 
-        const data = await response.json();
-        setMessage(data.message);
-        // console.log(data.message);
-        // console.log(message);
-        
-        
+            const data = await response.json();
+            setMessage(data.message);
+            setShowModal(true);
 
-        if (response.ok && data.token) {
-            dispatch(login(data.token));            
+            if (response.ok && data.token) {
+                // Wait 2 seconds before dispatching login
+                setTimeout(() => {
+                    dispatch(login(data.token));
+                }, 2000);
+            }
+        } catch (err) {
+            setMessage("Something went wrong.");
+            setShowModal(true);
         }
     };
 
     return (
         <div className="login-container">
             <h2 className="login-title">Login</h2>
-            <form onSubmit={(e)=>handleLogin(e)} className="login-form">
+            <form onSubmit={handleLogin} className="login-form">
                 <input
                     type="text"
                     placeholder="Username"
@@ -54,7 +56,27 @@ const Login: React.FC = () => {
                 />
                 <button type="submit">Login</button>
             </form>
-            {message && <p className="message-text">{message}</p>}
+
+            {/* Modal Popup for message */}
+            {showModal && (
+                <div className="modal show fade d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Login Status</h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowModal(false)}
+                                ></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>{message}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
