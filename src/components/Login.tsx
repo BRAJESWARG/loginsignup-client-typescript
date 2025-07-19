@@ -1,37 +1,44 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../store/authSlice';
-import './Login.css';
+import { AppDispatch } from '../store';
+import Modal from './UI/Modal';
+import '../styles/Login.css';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3001/login', {
+
+            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+            const response = await fetch(`${apiUrl}/login`, {
+
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
             const data = await response.json();
-            setMessage(data.message);
+
+            setMessage(data.message || 'Unexpected response');
             setShowModal(true);
 
             if (response.ok && data.token) {
-                // Wait 2 seconds before dispatching login
+                // Delay to show modal before switching screen
                 setTimeout(() => {
                     dispatch(login(data.token));
                 }, 2000);
             }
-        } catch (err) {
-            setMessage("Something went wrong.");
+        } catch (error) {
+            console.error('Login failed:', error);
+            setMessage('Something went wrong. Please try again.');
             setShowModal(true);
         }
     };
@@ -57,26 +64,12 @@ const Login: React.FC = () => {
                 <button type="submit">Login</button>
             </form>
 
-            {/* Modal Popup for message */}
-            {showModal && (
-                <div className="modal show fade d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Login Status</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setShowModal(false)}
-                                ></button>
-                            </div>
-                            <div className="modal-body">
-                                <p>{message}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal
+                title="Login Status"
+                message={message}
+                show={showModal}
+                onClose={() => setShowModal(false)}
+            />
         </div>
     );
 };
