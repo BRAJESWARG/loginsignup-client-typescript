@@ -46,3 +46,7 @@
     color: red;
     font-weight: 500;
 }
+
+.login-form button {
+    margin-top: 10px;
+}

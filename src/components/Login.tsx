@@ -4,42 +4,40 @@ import { login } from '../store/authSlice';
 import { AppDispatch } from '../store';
 import Modal from './UI/Modal';
 import '../styles/Login.css';
+import { loginUser } from '../services/api';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
-
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-            const response = await fetch(`${apiUrl}/login`, {
-
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const data = await response.json();
-
-            setMessage(data.message || 'Unexpected response');
+            const data = await loginUser(username, password);
+            setMessage(data.message || 'Login successful');
             setShowModal(true);
-
-            if (response.ok && data.token) {
-                // Delay to show modal before switching screen
+            const token = data.token;
+            if (typeof token === 'string') {
                 setTimeout(() => {
-                    dispatch(login(data.token));
+                    dispatch(login(token));
                 }, 2000);
             }
-        } catch (error) {
-            console.error('Login failed:', error);
-            setMessage('Something went wrong. Please try again.');
+            // if (data.token) {
+            //     setTimeout(() => {
+            //         dispatch(login(data.token));
+            //     }, 2000);
+            // }
+        } catch (error: any) {
+            setMessage(error.message || 'Something went wrong');
             setShowModal(true);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,7 +59,9 @@ const Login: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit">Login</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
+                </button>
             </form>
 
             <Modal
