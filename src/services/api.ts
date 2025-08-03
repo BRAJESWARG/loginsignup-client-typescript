@@ -1,7 +1,7 @@
 import { AuthResponse } from '../types/auth';
 
 export const loginUser = async (username: string, password: string): Promise<AuthResponse> => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8040';
 
 
     const response = await fetch(`${apiUrl}/login`, {
